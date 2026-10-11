@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "key": "blue",
+    "display_name": "XANH DƯƠNG",
+    "ui_color": "#38bdf8",
+    "enabled": true,
+    "min_confidence": 0.25,
+    "hsv_ranges": [
+      {"lower": [109, 92, 55], "upper": [120, 255, 227]},
+      {"lower": [97, 40, 71], "upper": [111, 255, 239]}
+    ]
+  },
+  {
+    "id": 2,
+    "key": "den",
+    "display_name": "ĐEN",
+    "ui_color": "#cbd5e1",
+    "enabled": true,
+    "min_confidence": 0.25,
+    "hsv_ranges": [
+      {"lower": [94, 10, 5], "upper": [124, 75, 83]}
+    ]
+  },
+  {
+    "id": 3,
+    "key": "do",
+    "display_name": "ĐỎ",
+    "ui_color": "#ef4444",
+    "enabled": true,
+    "min_confidence": 0.25,
+    "hsv_ranges": [
+      {"lower": [0, 89, 78], "upper": [25, 252, 254]}
+    ]
+  }
+]

@@ -1,0 +1,5 @@
+[
+  {"color_id": 1, "destination_id": 1, "enabled": true},
+  {"color_id": 2, "destination_id": 3, "enabled": true},
+  {"color_id": 3, "destination_id": 2, "enabled": true}
+]

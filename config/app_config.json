@@ -1,0 +1,53 @@
+{
+    "plc": {
+    "driver": "s7",
+    "host": "192.168.0.10",
+    "rack": 0,
+    "slot": 1,
+    "tcp_port": 102,
+    "command_db": 100,
+    "status_db": 101,
+    "poll_interval_s": 0.2
+  },
+  "camera": {
+    "source": 0,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "auto_start": false
+  },
+  "machine": {
+    "coordinate_unit": "mm",
+    "home_position": {"x": 0.0, "y": 0.0, "z": 0.0},
+    "default_jog_step_mm": 5.0,
+    "positive_machine_coordinates": true,
+    "limits": {
+      "x_min": 0.0,
+      "x_max": 9999.0,
+      "y_min": 0.0,
+      "y_max": 9999.0,
+      "z_min": 0.0,
+      "z_max": 9999.0
+    }
+  },
+  "vision": {
+    "roi": {"x": 493, "y": 46, "w": 643, "h": 497},
+    "sample_box_ratio": 0.55,
+    "classification": {
+      "min_confidence": 0.25,
+      "min_margin": 0.08,
+      "min_color_pixels": 250,
+      "kernel_size": 3,
+      "blur_kernel_size": 1
+    },
+    "presence": {
+      "require_background": true,
+      "diff_threshold": 25,
+      "enter_change_ratio": 0.08,
+      "exit_change_ratio": 0.04,
+      "kernel_size": 5
+    },
+    "stability": {"window_size": 7, "minimum_votes": 5, "release_frames": 5},
+    "yolo": {"enabled": false, "confidence": 0.5}
+  }
+}
