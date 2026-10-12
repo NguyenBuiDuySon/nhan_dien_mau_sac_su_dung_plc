@@ -1,39 +1,52 @@
 from __future__ import annotations
 
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class BasePage(QWidget):
-    """Base page dùng chung header công nghiệp cho mọi screen."""
+    """Khung tiêu đề dùng chung cho các màn hình HMI."""
 
-    def __init__(self, title: str, subtitle: str = "", icon: str = "◉") -> None:
+    def __init__(
+        self,
+        title: str,
+        subtitle: str = "",
+        icon: str = "",  # Giữ tham số để code cũ chưa cần sửa đồng loạt.
+    ) -> None:
         super().__init__()
+
         self.root = QVBoxLayout(self)
         self.root.setContentsMargins(18, 16, 18, 18)
         self.root.setSpacing(12)
 
         header = QFrame()
         header.setObjectName("pageHeader")
-        header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(18, 10, 18, 10)
-        header_layout.setSpacing(12)
 
-        icon_label = QLabel(icon)
-        icon_label.setObjectName("pageIcon")
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(22, 10, 22, 10)
+        layout.setSpacing(16)
+
         title_label = QLabel(title)
         title_label.setObjectName("pageTitle")
-        header_layout.addWidget(icon_label)
-        header_layout.addWidget(title_label)
-        header_layout.addStretch()
+        layout.addWidget(title_label)
+
+        layout.addStretch()
 
         if subtitle:
             divider = QFrame()
             divider.setFrameShape(QFrame.Shape.VLine)
-            divider.setStyleSheet("color:#43576b;")
-            header_layout.addWidget(divider)
+            divider.setObjectName("headerDivider")
+
             subtitle_label = QLabel(subtitle)
             subtitle_label.setObjectName("pageSubtitle")
             subtitle_label.setWordWrap(True)
-            header_layout.addWidget(subtitle_label)
+
+            layout.addWidget(divider)
+            layout.addWidget(subtitle_label)
 
         self.root.addWidget(header)

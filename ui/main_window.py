@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
-
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QDateTime, QTimer
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
     QFrame,
@@ -20,7 +18,6 @@ from ui.pages.alarm_page import AlarmPage
 from ui.pages.auto_page import AutoPage
 from ui.pages.manual_page import ManualPage
 from ui.pages.overview_page import OverviewPage
-from ui.pages.settings_page import SettingsPage
 from ui.pages.vision_page import VisionPage
 from ui.widgets import StatusLed
 
@@ -38,12 +35,15 @@ class MainWindow(QMainWindow):
         "Manual",
         "Vision",
         "Alarm",
-        "Cài đặt",
     )
 
     def __init__(self, context: ApplicationContext) -> None:
         super().__init__()
         self.context = context
+        # Các màn hình đều kế thừa QWidget.
+        # Khai báo kiểu rõ ràng để Pylance biết QStackedWidget có thể nhận chúng.
+        self.pages: dict[str, QWidget] = {}
+        self.nav_buttons: dict[str, QPushButton] = {}
         self.setWindowTitle("Hệ thống phân loại màu - PLC | V04")
         self.resize(1680, 960)
         self.setMinimumSize(1280, 760)
@@ -61,14 +61,15 @@ class MainWindow(QMainWindow):
         body_layout.addWidget(self._build_sidebar())
 
         self.stack = QStackedWidget()
-        self.pages = {
+        self.pages.update(
+        {
             "Tổng quan": OverviewPage(context),
             "Auto": AutoPage(context),
             "Manual": ManualPage(context),
             "Vision": VisionPage(context),
             "Alarm": AlarmPage(context),
-            "Cài đặt": SettingsPage(context),
         }
+    )
         for page in self.pages.values():
             self.stack.addWidget(page)
         body_layout.addWidget(self.stack, 1)
@@ -155,8 +156,6 @@ class MainWindow(QMainWindow):
         brand.setObjectName("sidebarBrand")
         layout.addWidget(brand)
 
-        self.nav_buttons: dict[str, QPushButton] = {}
-
         for name in self.NAV_ITEMS:
             button = QPushButton(name)
             button.setObjectName("navButton")
@@ -176,10 +175,12 @@ class MainWindow(QMainWindow):
         return sidebar
 
     def _activate_page(self, name: str) -> None:
-        page = self.pages.get(name) if hasattr(self, "pages") else None
+        """Chuyển màn hình hiện tại theo tên sidebar."""
+        page = self.pages.get(name)
         if page is not None:
             self.stack.setCurrentWidget(page)
-        for button_name, button in getattr(self, "nav_buttons", {}).items():
+
+        for button_name, button in self.nav_buttons.items():
             button.setProperty("active", button_name == name)
             button.style().unpolish(button)
             button.style().polish(button)
@@ -196,8 +197,11 @@ class MainWindow(QMainWindow):
         mode_color = "#22d3ee" if status.mode.value == "AUTO" else "#35e4d3"
         self.header_mode.setText(f"Chế độ\n{status.mode.value}")
         self.header_mode.setStyleSheet(f"color:{mode_color};")
-        now = datetime.now()
-        self.header_clock.setText(now.strftime("%H:%M:%S\n%d/%m/%Y"))
+        
+        now = QDateTime.currentDateTime()
+        self.header_clock.setText(
+            now.toString("HH:mm:ss\ndd/MM/yyyy")
+        )
 
         page = self.stack.currentWidget()
         refresh = getattr(page, "refresh", None)
