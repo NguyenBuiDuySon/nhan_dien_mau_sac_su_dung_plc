@@ -87,7 +87,7 @@ QLabel#pageIcon {
 }
 QLabel#sectionTitle {
     color: #eef5ff;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 850;
 }
 QLabel#sectionIcon {
@@ -96,44 +96,45 @@ QLabel#sectionIcon {
 }
 QLabel#muted, QLabel#metricCaption {
     color: #94a8bd;
+    font-size: 15px;
 }
 QFrame#metricPanel {
     background: #0d1825;
     border: 1px solid #2b4054;
     border-radius: 8px;
-    padding: 8px;
+    padding: 10px;
 }
 QLabel#metricValue {
     color: #21d7ee;
-    font-size: 27px;
+    font-size: 30px;
     font-weight: 850;
 }
 QLabel#metricUnit {
     color: #9eb0c3;
-    font-size: 14px;
+    font-size: 15px;
 }
 QLabel#counterName {
     color: #e4edf7;
-    font-size: 15px;
+    font-size: 16px;
 }
 QLabel#counterValue {
     color: #25d7ee;
     background: #08111b;
     border: 1px solid #172638;
     border-radius: 5px;
-    min-width: 82px;
-    padding: 5px 8px;
+    min-width: 90px;
+    padding: 6px 10px;
     font-family: "Consolas";
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 850;
 }
 QLabel#deviceFieldName {
     color: #9eb0c3;
-    font-size: 14px;
+    font-size: 15px;
 }
 QLabel#deviceFieldValue {
     color: #e9f2fb;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 750;
 }
 QLabel#totalCounterValue {
@@ -157,7 +158,7 @@ QLabel#modeBadge {
 }
 QLabel#statusText {
     color: #dce8f4;
-    font-size: 14px;
+    font-size: 15px;
 }
 QLabel#cameraView {
     background: #03080d;
@@ -300,6 +301,27 @@ QHeaderView::section {
     border-right: 1px solid #31475b;
     font-weight: 700;
 }
+QLabel#counterTableHeader {
+    color: #9fb2c5;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 2px 4px;
+}
+
+QLabel#totalCounterTitle {
+    color: #eef5ff;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+QScrollArea#counterScroll {
+    background: transparent;
+    border: none;
+}
+
+QScrollArea#counterScroll QWidget {
+    background: transparent;
+}
 QScrollBar:vertical {
     background: #0a1520;
     width: 10px;
@@ -325,4 +347,39 @@ QSlider::handle:horizontal {
 QCheckBox {
     spacing: 8px;
 }
+
+QLabel#classificationLabel {
+    color: #9eb0c3;
+    font-size: 15px;
+}
+
+QLabel#classificationValue {
+    color: #22d3ee;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+QPushButton#counterResetButton {
+    background: #17283a;
+    color: #dce8f4;
+    border: 1px solid #40556c;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+QPushButton#counterResetButton:hover {
+    background: #20364d;
+}
+
+QPushButton#startButton:disabled,
+QPushButton#pauseButton:disabled,
+QPushButton#stopButton:disabled,
+QPushButton#resetButton:disabled {
+    background: #182330;
+    color: #617387;
+    border: 1px solid #2c3b4a;
+}
+
 """
