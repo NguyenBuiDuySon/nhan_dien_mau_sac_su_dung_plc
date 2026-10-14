@@ -107,6 +107,19 @@ class ColorRepository:
         self.get(color_id).enabled = enabled
         self.save()
 
+    def remove(self, color_id: int) -> None:
+        """Xóa một màu đã được xác nhận không còn Routing.
+
+        Quy tắc Routing được kiểm tra bởi ColorManagementService.
+        """
+        profile = self.get(color_id)
+        del self._items[color_id]
+        try:
+            self.save()
+        except OSError:
+            self._items[color_id] = profile
+            raise
+
     @staticmethod
     def normalize_key(name: str) -> str:
         normalized = unicodedata.normalize("NFD", name.strip().lower())

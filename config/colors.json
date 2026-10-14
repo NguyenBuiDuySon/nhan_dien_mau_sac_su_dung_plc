@@ -7,8 +7,30 @@
     "enabled": true,
     "min_confidence": 0.25,
     "hsv_ranges": [
-      {"lower": [109, 92, 55], "upper": [120, 255, 227]},
-      {"lower": [97, 40, 71], "upper": [111, 255, 239]}
+      {
+        "lower": [
+          109,
+          92,
+          55
+        ],
+        "upper": [
+          120,
+          255,
+          227
+        ]
+      },
+      {
+        "lower": [
+          97,
+          40,
+          71
+        ],
+        "upper": [
+          111,
+          255,
+          239
+        ]
+      }
     ]
   },
   {
@@ -19,7 +41,18 @@
     "enabled": true,
     "min_confidence": 0.25,
     "hsv_ranges": [
-      {"lower": [94, 10, 5], "upper": [124, 75, 83]}
+      {
+        "lower": [
+          95,
+          10,
+          5
+        ],
+        "upper": [
+          124,
+          75,
+          83
+        ]
+      }
     ]
   },
   {
@@ -30,7 +63,62 @@
     "enabled": true,
     "min_confidence": 0.25,
     "hsv_ranges": [
-      {"lower": [0, 89, 78], "upper": [25, 252, 254]}
+      {
+        "lower": [
+          0,
+          89,
+          78
+        ],
+        "upper": [
+          25,
+          252,
+          254
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "key": "trang",
+    "display_name": "TRẮNG",
+    "ui_color": "#94a3b8",
+    "enabled": true,
+    "min_confidence": null,
+    "hsv_ranges": [
+      {
+        "lower": [
+          0,
+          0,
+          175
+        ],
+        "upper": [
+          179,
+          45,
+          255
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "key": "vang",
+    "display_name": "vàng",
+    "ui_color": "#94a3b8",
+    "enabled": false,
+    "min_confidence": null,
+    "hsv_ranges": [
+      {
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          0,
+          0,
+          0
+        ]
+      }
     ]
   }
 ]

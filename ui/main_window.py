@@ -76,6 +76,10 @@ class MainWindow(QMainWindow):
         root_layout.addWidget(body, 1)
         self.setCentralWidget(root)
 
+        vision_page = self.pages.get("Vision")
+        if isinstance(vision_page, VisionPage):
+            vision_page.colors_changed.connect(self._on_colors_changed)
+
         self._activate_page("Tổng quan")
         self.refresh_timer = QTimer(self)
         self.refresh_timer.setInterval(400)
@@ -90,6 +94,16 @@ class MainWindow(QMainWindow):
                 int(self.context.config.get("camera.fps", 30)),
             )
         self.refresh()
+
+    def _on_colors_changed(self) -> None:
+        """Cập nhật bộ đếm và bảng Routing sau khi sửa màu ở Vision."""
+        for page in self.pages.values():
+            rebuild = getattr(page, "_rebuild_counter_rows", None)
+            if callable(rebuild):
+                rebuild()
+        manual_page = self.pages.get("Manual")
+        if isinstance(manual_page, ManualPage):
+            manual_page._refresh_route_table()
 
     def _build_header(self) -> QFrame:
         header = QFrame()

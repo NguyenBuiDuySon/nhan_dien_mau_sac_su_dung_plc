@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -128,6 +128,10 @@ class OverviewPage(BasePage):
 
         self.context.camera.frame_ready.connect(
             self.camera_view.set_frame
+        )
+
+        self.context.camera.running_changed.connect(
+            self._on_camera_running_changed
         )
 
         camera_card = SectionCard(
@@ -666,3 +670,9 @@ class OverviewPage(BasePage):
         self.total_count.setText(
             f"{max(0, int(total)):04d}"
         )
+
+    @Slot(bool)
+    def _on_camera_running_changed(self, running: bool) -> None:
+        """Xóa frame cuối khi camera ngừng, không giữ hình cũ trên HMI."""
+        if not running:
+            self.camera_view.clear_frame()

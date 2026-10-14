@@ -11,6 +11,7 @@ class CameraWorker(QObject):
     frame_ready = Signal(object)
     error_occurred = Signal(str)
     stopped = Signal()
+    frame_cleared = Signal()
 
     def __init__(self, source: int | str, width: int, height: int, fps: int) -> None:
         super().__init__()
@@ -19,6 +20,7 @@ class CameraWorker(QObject):
         self.height = height
         self.fps = fps
         self._stop_event = Event()
+        self._stop_requested = False
 
     @Slot()
     def run(self) -> None:
@@ -38,7 +40,7 @@ class CameraWorker(QObject):
         try:
             while not self._stop_event.is_set():
                 ok, frame = capture.read()
-                if not ok or frame is None:
+                if not ok or frame.size == 0:
                     self.error_occurred.emit("Camera không trả về frame")
                     break
                 self.frame_ready.emit(frame)
@@ -85,6 +87,7 @@ class CameraService(QObject):
     def start(self, source: int | str, width: int, height: int, fps: int = 30) -> None:
         if self._running:
             return
+        self._stop_requested = False
         self._last_error = ""
         self._thread = QThread()
         self._worker = CameraWorker(source, width, height, fps)
@@ -100,9 +103,16 @@ class CameraService(QObject):
         self._thread.start()
 
     def stop(self) -> None:
-        worker = self._worker
-        if worker is not None:
-            worker.request_stop()
+        """Yêu cầu dừng camera và xóa frame đang lưu."""
+
+        self._stop_requested = True
+
+        with self._frame_lock:
+            self._latest_frame = None
+
+        # Thông báo tất cả màn hình xóa ảnh ngay.
+        if self._worker is not None:
+            self._worker.request_stop()
 
     def close(self) -> None:
         self.stop()
@@ -113,9 +123,13 @@ class CameraService(QObject):
 
     @Slot(object)
     def _handle_frame(self, frame: object) -> None:
+        if self._stop_requested:
+            return
+
         if isinstance(frame, np.ndarray):
             with self._frame_lock:
                 self._latest_frame = frame.copy()
+
             self.frame_ready.emit(frame)
 
     @Slot(str)
@@ -125,8 +139,12 @@ class CameraService(QObject):
 
     @Slot()
     def _handle_stopped(self) -> None:
+        with self._frame_lock:
+            self._latest_frame = None
+
         self._running = False
         self.running_changed.emit(False)
+        self._stop_requested = False
 
     @Slot()
     def _cleanup_thread(self) -> None:

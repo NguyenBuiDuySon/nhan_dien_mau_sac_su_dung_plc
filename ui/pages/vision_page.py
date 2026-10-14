@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+
 from PySide6.QtWidgets import (
     QComboBox,
     QGridLayout,
@@ -16,11 +17,15 @@ from PySide6.QtWidgets import (
 )
 
 from app.context import ApplicationContext
+from domain.machine import MachineState
+from ui.dialogs.color_manager_dialog import ColorManagerDialog
 from ui.pages.base_page import BasePage
 from ui.widgets import CameraView, SectionCard, StatusLed
 
 
 class VisionPage(BasePage):
+    colors_changed = Signal()
+
     def __init__(self, context: ApplicationContext) -> None:
         super().__init__(
             "MÀN HÌNH VISION",
@@ -35,6 +40,7 @@ class VisionPage(BasePage):
         left = QVBoxLayout()
         self.camera_view = CameraView("CAMERA OFFLINE")
         self.context.camera.frame_ready.connect(self.camera_view.set_frame)
+        self.context.camera.running_changed.connect(self._on_camera_running_changed)
         left.addWidget(SectionCard("HÌNH ẢNH CAMERA TRỰC TIẾP", self.camera_view, title_icon="▣"), 1)
         left.addWidget(self._build_camera_controls())
         content.addLayout(left, 5)
@@ -119,6 +125,15 @@ class VisionPage(BasePage):
         save.setObjectName("secondaryBlueButton")
         save.clicked.connect(self._save_hsv)
         root.addWidget(save)
+
+        hsv_actions = QHBoxLayout()
+        add_range = QPushButton("THÊM DẢI HSV")
+        add_range.clicked.connect(self._add_hsv_range)
+        remove_range = QPushButton("XÓA DẢI HSV")
+        remove_range.clicked.connect(self._remove_hsv_range)
+        hsv_actions.addWidget(add_range)
+        hsv_actions.addWidget(remove_range)
+        root.addLayout(hsv_actions)
         note = QLabel("H của OpenCV dùng 0..179; S/V dùng 0..255. Một màu có thể có nhiều dải HSV.")
         note.setWordWrap(True)
         note.setObjectName("muted")
@@ -127,27 +142,54 @@ class VisionPage(BasePage):
 
     def _build_color_legend(self) -> SectionCard:
         self.legend_body = QWidget()
-        self.legend_layout = QHBoxLayout(self.legend_body)
-        self.legend_layout.setContentsMargins(0, 0, 0, 0)
+        root = QVBoxLayout(self.legend_body)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(8)
+        self.legend_layout = QHBoxLayout()
+        root.addLayout(self.legend_layout)
+
+        manager_button = QPushButton("QUẢN LÝ MÀU (THÊM / SỬA / XÓA)")
+        manager_button.setObjectName("secondaryBlueButton")
+        manager_button.clicked.connect(self._open_color_manager)
+        root.addWidget(manager_button)
         return SectionCard("MÀU SẢN PHẨM (THAM KHẢO)", self.legend_body, title_icon="●")
 
-    def _reload_colors(self) -> None:
+    def _reload_colors(self, preferred_color_id: int | None = None) -> None:
+        """Tải lại danh sách mà vẫn giữ màu đang chọn khi có thể."""
+        selected_id = (
+            preferred_color_id
+            if preferred_color_id is not None
+            else self.color_combo.currentData()
+        )
         self.color_combo.blockSignals(True)
-        self.color_combo.clear()
-        for color in self.context.colors.all():
-            self.color_combo.addItem(color.display_name, color.id)
-        self.color_combo.blockSignals(False)
+        try:
+            self.color_combo.clear()
+            for color in self.context.colors.all():
+                suffix = "" if color.enabled else " [TẮT]"
+                self.color_combo.addItem(color.display_name + suffix, color.id)
+            if self.color_combo.count():
+                index = self.color_combo.findData(selected_id)
+                self.color_combo.setCurrentIndex(index if index >= 0 else 0)
+        finally:
+            self.color_combo.blockSignals(False)
         self._rebuild_legend()
         if self.color_combo.count():
-            self.color_combo.setCurrentIndex(0)
             self._load_color()
+        else:
+            self.range_combo.clear()
 
     def _rebuild_legend(self) -> None:
         while self.legend_layout.count():
             item = self.legend_layout.takeAt(0)
+
+            if item is None:
+                break
+
             widget = item.widget()
+
             if widget is not None:
                 widget.deleteLater()
+        
         for color in self.context.colors.enabled():
             label = QLabel(f"■  {color.display_name}")
             label.setStyleSheet(f"color:{color.ui_color}; font-weight:700;")
@@ -185,6 +227,12 @@ class VisionPage(BasePage):
         self._loading_hsv = False
 
     def _save_hsv(self) -> None:
+        if not self._editing_allowed():
+            return
+        for channel in ('h', 's', 'v'):
+            if self.hsv_inputs[f'low_{channel}'].value() > self.hsv_inputs[f'high_{channel}'].value():
+                QMessageBox.warning(self, 'HSV không hợp lệ', f'Low {channel.upper()} phải nhỏ hơn hoặc bằng High {channel.upper()}.')
+                return
         color_id = self.color_combo.currentData()
         range_index = self.range_combo.currentData()
         if color_id is None or range_index is None:
@@ -200,10 +248,77 @@ class VisionPage(BasePage):
         profile.hsv_ranges[int(range_index)] = new_range
         try:
             self.context.colors.update(profile)
-        except Exception as error:
+        except (ValueError, KeyError, OSError) as error:
             QMessageBox.warning(self, "Không lưu được HSV", str(error))
             return
         QMessageBox.information(self, "HSV", "Đã lưu dải HSV hiện tại.")
+
+    def _editing_allowed(self) -> bool:
+        if self.context.plc.get_status().state == MachineState.RUNNING:
+            QMessageBox.warning(self, "Đang chạy AUTO", "Dừng chu trình AUTO trước khi sửa HSV hoặc danh sách màu.")
+            return False
+        return True
+
+    def _open_color_manager(self) -> None:
+        if not self._editing_allowed():
+            return
+        dialog = ColorManagerDialog(self.context, self)
+        dialog.colors_modified.connect(self._on_colors_modified)
+        dialog.exec()
+
+    def _on_colors_modified(self, preferred_id: int) -> None:
+        self._reload_colors(preferred_id if preferred_id >= 0 else None)
+        self.colors_changed.emit()
+
+    def _add_hsv_range(self) -> None:
+        if not self._editing_allowed():
+            return
+        color_id = self.color_combo.currentData()
+        index = self.range_combo.currentData()
+        if color_id is None or index is None:
+            return
+        profile = deepcopy(self.context.colors.get(int(color_id)))
+        if len(profile.hsv_ranges) >= 10:
+            QMessageBox.warning(self, "Dải HSV", "Giới hạn 10 dải HSV cho mỗi màu.")
+            return
+        profile.hsv_ranges.append(deepcopy(profile.hsv_ranges[int(index)]))
+        try:
+            self.context.colors.update(profile)
+        except (OSError, ValueError, KeyError) as error:
+            QMessageBox.warning(self, "Không thêm được dải HSV", str(error))
+            return
+        self._load_color()
+        self.range_combo.setCurrentIndex(self.range_combo.count() - 1)
+        self._load_range()
+        QMessageBox.information(self, "Dải HSV", "Đã thêm một dải từ bản sao dải đang chọn. Hãy chỉnh và lưu ngưỡng mới.")
+
+    def _remove_hsv_range(self) -> None:
+        if not self._editing_allowed():
+            return
+        color_id = self.color_combo.currentData()
+        index = self.range_combo.currentData()
+        if color_id is None or index is None:
+            return
+        profile = deepcopy(self.context.colors.get(int(color_id)))
+        if len(profile.hsv_ranges) <= 1:
+            QMessageBox.warning(self, "Dải HSV", "Mỗi màu phải còn ít nhất một dải HSV.")
+            return
+        confirmation = QMessageBox.question(
+            self,
+            "Xác nhận xóa dải HSV",
+            f"Xóa dải HSV số {int(index) + 1} của '{profile.display_name}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirmation != QMessageBox.StandardButton.Yes:
+            return
+        profile.hsv_ranges.pop(int(index))
+        try:
+            self.context.colors.update(profile)
+        except (OSError, ValueError, KeyError) as error:
+            QMessageBox.warning(self, "Không xóa được dải HSV", str(error))
+            return
+        self._load_color()
 
     def _toggle_camera(self) -> None:
         if self.context.camera.running:
@@ -243,3 +358,20 @@ class VisionPage(BasePage):
         self.confidence.setText(f"{result.confidence * 100:.0f} %")
         self.result_led.set_text("Ổn định" if result.stable else "Đang xác nhận")
         self.result_led.set_active(result.stable, warning=not result.stable)
+
+    def _on_camera_running_changed(self, running: bool) -> None:
+        if not running:
+            self._on_camera_cleared()
+    
+    def _on_camera_cleared(self) -> None:
+        """Xóa hình ảnh và kết quả nhận diện khi camera dừng."""
+
+        self.camera_view.clear_frame("CAMERA OFFLINE")
+
+        self.context.state.current_detection = None
+
+        self.detected_color.setText("--")
+        self.confidence.setText("-- %")
+
+        self.result_led.set_text("Chưa có kết quả")
+        self.result_led.set_active(False)
