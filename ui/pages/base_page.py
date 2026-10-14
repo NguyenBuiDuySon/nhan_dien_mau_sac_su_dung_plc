@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
+from PySide6.QtCore import Qt
 
 class BasePage(QWidget):
     """Khung tiêu đề dùng chung cho các màn hình HMI."""
@@ -44,7 +44,12 @@ class BasePage(QWidget):
 
             subtitle_label = QLabel(subtitle)
             subtitle_label.setObjectName("pageSubtitle")
-            subtitle_label.setWordWrap(True)
+            subtitle_label.setWordWrap(False)
+            subtitle_label.setMinimumWidth(430)
+            subtitle_label.setAlignment(
+                Qt.AlignmentFlag.AlignRight
+                | Qt.AlignmentFlag.AlignVCenter
+            )
 
             layout.addWidget(divider)
             layout.addWidget(subtitle_label)
