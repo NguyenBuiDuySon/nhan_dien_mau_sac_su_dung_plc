@@ -1,5 +1,5 @@
 {
-    "plc": {
+  "plc": {
     "driver": "s7",
     "host": "192.168.0.10",
     "rack": 0,
@@ -18,20 +18,41 @@
   },
   "machine": {
     "coordinate_unit": "mm",
-    "home_position": {"x": 0.0, "y": 0.0, "z": 0.0},
+    "home_position": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
     "default_jog_step_mm": 5.0,
     "positive_machine_coordinates": true,
-    "limits": {
-      "x_min": 0.0,
-      "x_max": 9999.0,
-      "y_min": 0.0,
-      "y_max": 9999.0,
-      "z_min": 0.0,
-      "z_max": 9999.0
+    "axes": {
+      "x": {
+        "min_mm": 0.0,
+        "max_mm": 600.0,
+        "velocity_mm_s": 200.0,
+        "jog_step_mm": 10.0
+      },
+      "y": {
+        "min_mm": 0.0,
+        "max_mm": 300.0,
+        "velocity_mm_s": 100.0,
+        "jog_step_mm": 10.0
+      },
+      "z": {
+        "min_mm": 0.0,
+        "max_mm": 200.0,
+        "velocity_mm_s": 80.0,
+        "jog_step_mm": 5.0
+      }
     }
   },
   "vision": {
-    "roi": {"x": 493, "y": 46, "w": 643, "h": 497},
+    "roi": {
+      "x": 493,
+      "y": 46,
+      "w": 643,
+      "h": 497
+    },
     "sample_box_ratio": 0.55,
     "classification": {
       "min_confidence": 0.25,
@@ -47,7 +68,14 @@
       "exit_change_ratio": 0.04,
       "kernel_size": 5
     },
-    "stability": {"window_size": 7, "minimum_votes": 5, "release_frames": 5},
-    "yolo": {"enabled": false, "confidence": 0.5}
+    "stability": {
+      "window_size": 7,
+      "minimum_votes": 5,
+      "release_frames": 5
+    },
+    "yolo": {
+      "enabled": false,
+      "confidence": 0.5
+    }
   }
 }

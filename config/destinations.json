@@ -1,6 +1,47 @@
 [
-  {"id": 1, "key": "bin_blue", "display_name": "BIN A", "x": 250.0, "y": 55.0, "z": 30.0, "enabled": true},
-  {"id": 2, "key": "bin_red", "display_name": "BIN B", "x": 250.0, "y": 165.0, "z": 30.0, "enabled": true},
-  {"id": 3, "key": "bin_black", "display_name": "BIN C", "x": 250.0, "y": 270.0, "z": 30.0, "enabled": true},
-  {"id": 99, "key": "error", "display_name": "ERROR BIN", "x": 250.0, "y": 270.0, "z": 30.0, "enabled": true}
+  {
+    "id": 1,
+    "key": "bin_blue",
+    "display_name": "BIN A",
+    "x": 250.0,
+    "y": 55.0,
+    "z": 30.0,
+    "enabled": true
+  },
+  {
+    "id": 2,
+    "key": "bin_red",
+    "display_name": "BIN B",
+    "x": 250.0,
+    "y": 165.0,
+    "z": 30.0,
+    "enabled": true
+  },
+  {
+    "id": 3,
+    "key": "bin_black",
+    "display_name": "BIN C",
+    "x": 250.0,
+    "y": 270.0,
+    "z": 30.0,
+    "enabled": true
+  },
+  {
+    "id": 4,
+    "key": "position_4",
+    "display_name": "VỊ TRÍ 4",
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0,
+    "enabled": true
+  },
+  {
+    "id": 99,
+    "key": "error",
+    "display_name": "ERROR BIN",
+    "x": 250.0,
+    "y": 270.0,
+    "z": 30.0,
+    "enabled": true
+  }
 ]

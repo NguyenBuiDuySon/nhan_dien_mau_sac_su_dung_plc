@@ -242,11 +242,18 @@ QPushButton#resetButton {
 }
 QPushButton#manualButton {
     background: #075da8;
-    border-color: #1885e3;
+    border: 1px solid #1885e3;
+    border-radius: 5px;
     color: #ffffff;
-    font-size: 17px;
-    font-weight: 800;
-    min-height: 52px;
+    font-size: 13px;
+    font-weight: 700;
+    min-height: 0px;
+    padding: 0px;
+}
+QPushButton#manualButton:disabled {
+    background: #173247;
+    border-color: #29465e;
+    color: #71869b;
 }
 QPushButton#positiveButton {
     background: #078653;
@@ -380,6 +387,68 @@ QPushButton#resetButton:disabled {
     background: #182330;
     color: #617387;
     border: 1px solid #2c3b4a;
+}
+
+QLabel#axisTableHeader {
+    color: #9fb2c5;
+    font-size: 14px;
+    font-weight: 750;
+}
+
+QWidget#axisControlRow {
+    background: #0b1723;
+    border: 1px solid #24384b;
+    border-radius: 6px;
+}
+
+QLabel#axisName {
+    color: #eef5ff;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+QLabel#axisReadonlyValue {
+    color: #9eb0c3;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+QLabel#axisPositionValue {
+    color: #22d3ee;
+    background: #07111b;
+    border: 1px solid #17283a;
+    border-radius: 5px;
+    padding: 7px 8px;
+    font-family: "Consolas";
+    font-size: 24px;
+    font-weight: 850;
+}
+
+QDoubleSpinBox {
+    min-height: 34px;
+    padding: 3px 7px;
+    background: #0a1622;
+    color: #e7f0fa;
+    border: 1px solid #3a5066;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+QDoubleSpinBox:focus {
+    border: 1px solid #22d3ee;
+}
+
+QLineEdit#axisInput {
+    background: #0a1622;
+    color: #e7f0fa;
+    border: 1px solid #3a5066;
+    border-radius: 5px;
+    padding: 4px 7px;
+    font-size: 14px;
+}
+
+QLineEdit#axisInput:focus {
+    border: 1px solid #22d3ee;
 }
 
 """

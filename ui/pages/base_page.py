@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
+
 class BasePage(QWidget):
     """Khung tiêu đề dùng chung cho các màn hình HMI."""
 
